@@ -11,6 +11,8 @@ import 'providers/menu_provider.dart';
 import 'providers/order_provider.dart';
 import 'screens/auth/splash_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/admin/admin_home_screen.dart';
+import 'screens/delivery_man/driver_home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,7 +55,11 @@ class MyApp extends StatelessWidget {
       title: AppConstants.appName,
       theme: AppTheme.lightTheme,
       home: const SplashScreen(),
-      routes: {'/home': (_) => const HomeScreen()},
+      routes: {
+        '/home': (_) => const HomeScreen(),
+        '/admin': (_) => const AdminHomeScreen(),
+        '/driver': (_) => const DriverHomeScreen(),
+      },
     );
   }
 }

@@ -5,6 +5,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../widgets/custom/custom_app_bar.dart';
 import '../../widgets/common/loading_indicator.dart';
+import 'place_order_screen.dart';
 
 /// Order Screen
 class OrderScreen extends StatefulWidget {
@@ -145,18 +146,25 @@ class _CartTab extends StatelessWidget {
                       // Image
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          item.imageUrl,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Container(
-                            width: 80,
-                            height: 80,
-                            color: AppColors.lightGray,
-                            child: const Icon(Icons.image_not_supported),
-                          ),
-                        ),
+                        child: item.imageUrl != null
+                            ? Image.asset(
+                                item.imageUrl!,
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => Container(
+                                  width: 80,
+                                  height: 80,
+                                  color: AppColors.lightGray,
+                                  child: const Icon(Icons.image_not_supported),
+                                ),
+                              )
+                            : Container(
+                                width: 80,
+                                height: 80,
+                                color: AppColors.lightGray,
+                                child: const Icon(Icons.image_not_supported),
+                              ),
                       ),
                       const SizedBox(width: 12),
                       // Details
@@ -241,7 +249,14 @@ class _CartTab extends StatelessWidget {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        // Navigate to order placement
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PlaceOrderScreen(
+                              cartItems: orderProvider.cartItems,
+                            ),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 48),

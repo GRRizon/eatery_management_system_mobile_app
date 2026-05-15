@@ -78,6 +78,63 @@ class SecureStorageService {
     }
   }
 
+  /// Save user refresh token
+  Future<void> saveRefreshToken(String token) async {
+    try {
+      AppLogger.info('Saving refresh token');
+      await _storage.write(
+        key: '${AppConstants.userTokenKey}_refresh',
+        value: token,
+      );
+    } catch (e) {
+      AppLogger.error('Error saving refresh token: $e');
+      rethrow;
+    }
+  }
+
+  /// Retrieve user refresh token
+  Future<String?> getRefreshToken() async {
+    try {
+      return await _storage.read(key: '${AppConstants.userTokenKey}_refresh');
+    } catch (e) {
+      AppLogger.error('Error retrieving refresh token: $e');
+      return null;
+    }
+  }
+
+  /// Remove authentication token
+  Future<void> removeAuthToken() async {
+    try {
+      AppLogger.info('Removing auth token');
+      await delete(AppConstants.userTokenKey);
+    } catch (e) {
+      AppLogger.error('Error removing auth token: $e');
+      rethrow;
+    }
+  }
+
+  /// Remove refresh token
+  Future<void> removeRefreshToken() async {
+    try {
+      AppLogger.info('Removing refresh token');
+      await delete('${AppConstants.userTokenKey}_refresh');
+    } catch (e) {
+      AppLogger.error('Error removing refresh token: $e');
+      rethrow;
+    }
+  }
+
+  /// Remove user data
+  Future<void> removeUserData() async {
+    try {
+      AppLogger.info('Removing user data');
+      await delete(AppConstants.userDataKey);
+    } catch (e) {
+      AppLogger.error('Error removing user data: $e');
+      rethrow;
+    }
+  }
+
   /// Save a string value
   Future<void> saveString(String key, String value) async {
     try {

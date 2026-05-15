@@ -30,9 +30,7 @@ class MenuService {
       category: 'Hot Coffee',
       imageUrl: ImageAssets.espressoCoffee,
       preparationTime: 3,
-      createdAt: DateTime.now(),
       rating: 4.8,
-      reviewCount: 145,
     ),
     MenuItem(
       id: 'menu_002',
@@ -43,9 +41,7 @@ class MenuService {
       imageUrl: ImageAssets.latteCoffee,
       preparationTime: 5,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.7,
-      reviewCount: 98,
     ),
     MenuItem(
       id: 'menu_003',
@@ -57,9 +53,7 @@ class MenuService {
       imageUrl: ImageAssets.cappuccinoCoffee,
       preparationTime: 6,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.9,
-      reviewCount: 156,
     ),
     MenuItem(
       id: 'menu_004',
@@ -70,9 +64,7 @@ class MenuService {
       imageUrl: ImageAssets.latteCoffee,
       preparationTime: 6,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.6,
-      reviewCount: 87,
     ),
     MenuItem(
       id: 'menu_005',
@@ -83,9 +75,7 @@ class MenuService {
       imageUrl: ImageAssets.cappuccinoCoffee,
       preparationTime: 5,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.5,
-      reviewCount: 76,
     ),
 
     // Cold Coffee Section
@@ -99,9 +89,7 @@ class MenuService {
       preparationTime: 4,
       isVegetarian: true,
       isVegan: true,
-      createdAt: DateTime.now(),
       rating: 4.4,
-      reviewCount: 67,
     ),
     MenuItem(
       id: 'menu_007',
@@ -113,9 +101,7 @@ class MenuService {
       preparationTime: 2,
       isVegetarian: true,
       isVegan: true,
-      createdAt: DateTime.now(),
       rating: 4.7,
-      reviewCount: 112,
     ),
     MenuItem(
       id: 'menu_008',
@@ -126,9 +112,7 @@ class MenuService {
       imageUrl: ImageAssets.latteCoffee,
       preparationTime: 5,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.8,
-      reviewCount: 134,
     ),
 
     // Specialty Drinks Section
@@ -141,9 +125,7 @@ class MenuService {
       imageUrl: ImageAssets.greenTea,
       preparationTime: 7,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.6,
-      reviewCount: 89,
     ),
     MenuItem(
       id: 'menu_010',
@@ -154,9 +136,7 @@ class MenuService {
       imageUrl: ImageAssets.blackTea,
       preparationTime: 6,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.5,
-      reviewCount: 78,
     ),
 
     // Tea & Infusions Section
@@ -170,9 +150,7 @@ class MenuService {
       preparationTime: 4,
       isVegetarian: true,
       isVegan: true,
-      createdAt: DateTime.now(),
       rating: 4.3,
-      reviewCount: 45,
     ),
     MenuItem(
       id: 'menu_012',
@@ -184,9 +162,7 @@ class MenuService {
       preparationTime: 4,
       isVegetarian: true,
       isVegan: true,
-      createdAt: DateTime.now(),
       rating: 4.4,
-      reviewCount: 52,
     ),
 
     // Pastries Section
@@ -199,9 +175,7 @@ class MenuService {
       imageUrl: ImageAssets.blueberryMuffinCake,
       preparationTime: 2,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.9,
-      reviewCount: 167,
     ),
     MenuItem(
       id: 'menu_014',
@@ -212,9 +186,7 @@ class MenuService {
       imageUrl: ImageAssets.blueberryMuffinCake,
       preparationTime: 2,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.6,
-      reviewCount: 98,
     ),
 
     // Sandwiches Section
@@ -226,9 +198,7 @@ class MenuService {
       category: 'Sandwiches',
       imageUrl: ImageAssets.grilledSandwich,
       preparationTime: 8,
-      createdAt: DateTime.now(),
       rating: 4.7,
-      reviewCount: 123,
     ),
     MenuItem(
       id: 'menu_016',
@@ -239,9 +209,7 @@ class MenuService {
       imageUrl: ImageAssets.vegSandwich,
       preparationTime: 7,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.5,
-      reviewCount: 89,
     ),
 
     // Desserts Section
@@ -254,9 +222,7 @@ class MenuService {
       imageUrl: ImageAssets.carrotCake,
       preparationTime: 2,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.8,
-      reviewCount: 145,
     ),
     MenuItem(
       id: 'menu_018',
@@ -267,9 +233,7 @@ class MenuService {
       imageUrl: ImageAssets.carrotCake,
       preparationTime: 2,
       isVegetarian: true,
-      createdAt: DateTime.now(),
       rating: 4.7,
-      reviewCount: 134,
     ),
 
     // Beverages Section
@@ -283,9 +247,7 @@ class MenuService {
       preparationTime: 2,
       isVegetarian: true,
       isVegan: true,
-      createdAt: DateTime.now(),
       rating: 4.4,
-      reviewCount: 67,
     ),
     MenuItem(
       id: 'menu_020',
@@ -297,9 +259,7 @@ class MenuService {
       preparationTime: 1,
       isVegetarian: true,
       isVegan: true,
-      createdAt: DateTime.now(),
       rating: 4.2,
-      reviewCount: 45,
     ),
   ];
 
@@ -400,7 +360,8 @@ class MenuService {
           .where(
             (item) =>
                 item.name.toLowerCase().contains(lowerQuery) ||
-                item.description.toLowerCase().contains(lowerQuery) ||
+                (item.description?.toLowerCase().contains(lowerQuery) ??
+                    false) ||
                 item.category.toLowerCase().contains(lowerQuery),
           )
           .toList();
@@ -465,7 +426,7 @@ class MenuService {
       AppLogger.info('Fetching popular menu items');
       await Future.delayed(const Duration(milliseconds: 300));
       return _mockMenuItems
-          .where((item) => item.hasGoodRating)
+          .where((item) => item.rating > 4.0)
           .take(limit)
           .toList();
     } catch (e) {
@@ -478,8 +439,8 @@ class MenuService {
   Future<List<MenuItem>> getRecentlyAdded({int limit = 5}) async {
     try {
       AppLogger.info('Fetching recently added items');
-      final recent = _mockMenuItems.toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final recent = _mockMenuItems.toList();
+      // Sort by ID or name since createdAt is not available
       return recent.take(limit).toList();
     } catch (e) {
       AppLogger.error('Error fetching recently added items: $e');

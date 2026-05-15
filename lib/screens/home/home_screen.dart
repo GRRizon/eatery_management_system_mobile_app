@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../config/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/menu_provider.dart';
 import '../../providers/order_provider.dart';
-import '../../widgets/custom/custom_app_bar.dart';
-import '../../widgets/custom/menu_item_card.dart';
-import '../../widgets/common/loading_indicator.dart';
+import '../../widgets/index.dart';
 import '../menu/menu_screen.dart';
 import '../order/order_screen.dart';
+import '../order/place_order_screen.dart';
 import '../profile/user_profile_screen.dart';
 
 /// Home Screen - Main dashboard
@@ -54,6 +54,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       body: pages[_selectedIndex],
+      floatingActionButton:
+          _selectedIndex !=
+              2 // Hide FAB on Orders tab
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PlaceOrderScreen()),
+                );
+              },
+              backgroundColor: AppColors.primary,
+              child: const Icon(Icons.add_shopping_cart),
+            )
+          : null,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
@@ -80,14 +94,46 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 /// Home Page Content
-class _HomePageContent extends StatelessWidget {
+class _HomePageContent extends StatefulWidget {
   const _HomePageContent();
+
+  @override
+  State<_HomePageContent> createState() => _HomePageContentState();
+}
+
+class _HomePageContentState extends State<_HomePageContent> {
+  final List<String> categories = [
+    'Pizza',
+    'Burgers',
+    'Pasta',
+    'Salads',
+    'Desserts',
+    'Drinks',
+  ];
+  final List<IconData> categoryIcons = [
+    Icons.local_pizza,
+    Icons.lunch_dining,
+    Icons.restaurant,
+    Icons.fastfood,
+    Icons.cake,
+    Icons.local_drink,
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        title: 'Eatery',
+      backgroundColor: AppColors.backgroundColor,
+      appBar: AppBar(
+        backgroundColor: AppColors.white,
+        elevation: 0,
+        title: Text(
+          'Eatery',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
         actions: [
           Consumer<OrderProvider>(
             builder: (_, orderProvider, _) {
@@ -97,7 +143,10 @@ class _HomePageContent extends StatelessWidget {
                   alignment: Alignment.topRight,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.shopping_cart),
+                      icon: const Icon(
+                        Icons.shopping_cart,
+                        color: AppColors.primary,
+                      ),
                       onPressed: () {
                         // Navigate to cart
                       },
@@ -385,7 +434,7 @@ class _HomePageContent extends StatelessWidget {
                                 menuItemId: items[index].id,
                                 itemName: items[index].name,
                                 itemPrice: items[index].price,
-                                imageUrl: items[index].imageUrl,
+                                imageUrl: items[index].imageUrl ?? '',
                               );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(

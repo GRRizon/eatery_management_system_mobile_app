@@ -12,8 +12,10 @@ class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isAuthenticated = false;
 
-  AuthProvider(this._authService) {
-    _initialize();
+  AuthProvider(this._authService, {bool autoInitialize = true}) {
+    if (autoInitialize) {
+      _initialize();
+    }
   }
 
   // Getters
@@ -39,6 +41,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> login({
     required String username,
     required String password,
+    UserRole role = UserRole.user,
   }) async {
     try {
       _isLoading = true;
@@ -48,6 +51,7 @@ class AuthProvider extends ChangeNotifier {
       final user = await _authService.login(
         username: username,
         password: password,
+        role: role,
       );
 
       _currentUser = user;
@@ -72,6 +76,7 @@ class AuthProvider extends ChangeNotifier {
     required String password,
     required String fullName,
     required String phoneNumber,
+    UserRole role = UserRole.user,
   }) async {
     try {
       _isLoading = true;
@@ -84,6 +89,7 @@ class AuthProvider extends ChangeNotifier {
         password: password,
         fullName: fullName,
         phoneNumber: phoneNumber,
+        role: role,
       );
 
       _currentUser = user;

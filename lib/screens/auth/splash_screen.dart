@@ -8,7 +8,7 @@ import '../../utils/logger.dart';
 import '../../utils/image_assets.dart';
 import '../home/home_screen.dart';
 import '../admin/admin_home_screen.dart';
-import '../driver/driver_home_screen.dart';
+import '../delivery_man/driver_home_screen.dart';
 import 'login_screen.dart';
 
 /// Splash Screen shown on app startup

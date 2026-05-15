@@ -4,8 +4,12 @@ import '../../config/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/custom/custom_text_field.dart';
 import '../../widgets/custom/custom_button.dart';
+import '../../widgets/custom/user_type_dropdown.dart';
 import '../../utils/validators.dart';
+import '../../models/user_model.dart';
 import '../home/home_screen.dart';
+import '../admin/admin_home_screen.dart';
+import '../delivery_man/driver_home_screen.dart';
 import 'signup_screen.dart';
 import 'forgot_password_screen.dart';
 
@@ -21,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _usernameController;
   late TextEditingController _passwordController;
+  UserRole _selectedUserType = UserRole.user;
 
   @override
   void initState() {
@@ -45,14 +50,32 @@ class _LoginScreenState extends State<LoginScreen> {
     final success = await authProvider.login(
       username: _usernameController.text.trim(),
       password: _passwordController.text,
+      role: _selectedUserType,
     );
 
     if (!mounted) return;
 
     if (success) {
+      // Navigate based on user role
+      final currentUser = authProvider.currentUser;
+      Widget homeScreen;
+
+      switch (currentUser?.role) {
+        case UserRole.admin:
+          homeScreen = const AdminHomeScreen();
+          break;
+        case UserRole.driver:
+          homeScreen = const DriverHomeScreen();
+          break;
+        case UserRole.user:
+        default:
+          homeScreen = const HomeScreen();
+          break;
+      }
+
       Navigator.of(
         context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
+      ).pushReplacement(MaterialPageRoute(builder: (_) => homeScreen));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -78,8 +101,10 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         child: SingleChildScrollView(
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -132,6 +157,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     key: _formKey,
                     child: Column(
                       children: [
+                        // User Type Dropdown
+                        UserTypeDropdown(
+                          value: _selectedUserType,
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _selectedUserType = value;
+                              });
+                            }
+                          },
+                          label: 'Login as',
+                          hint: 'Select user type',
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Please select a user type';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
                         // Username Field
                         CustomTextField(
                           label: 'Username',
@@ -248,7 +293,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Test Credentials Info
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppColors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -256,12 +301,28 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: AppColors.white.withValues(alpha: 0.2),
                     ),
                   ),
-                  child: Text(
-                    'Test: Username: Rabbani | Password: golam1234',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.labelSmall?.copyWith(color: AppColors.white),
-                    textAlign: TextAlign.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Demo Credentials:',
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: AppColors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      _buildDemoCredential('Customer', 'Rabbani', 'golam1234'),
+                      const SizedBox(height: 4),
+                      _buildDemoCredential('Admin', 'Admin', 'tasmin1234'),
+                      const SizedBox(height: 4),
+                      _buildDemoCredential(
+                        'Delivery Man',
+                        'Mikail',
+                        'mikail1234',
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -269,6 +330,27 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDemoCredential(String role, String username, String password) {
+    return Row(
+      children: [
+        Icon(
+          Icons.person,
+          size: 16,
+          color: AppColors.white.withValues(alpha: 0.8),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            '$role: $username / $password',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: AppColors.white.withValues(alpha: 0.9),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

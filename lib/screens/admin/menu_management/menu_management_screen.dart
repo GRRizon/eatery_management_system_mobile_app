@@ -182,7 +182,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   image: DecorationImage(
-                                    image: AssetImage(item.imageUrl),
+                                    image: AssetImage(item.imageUrl ?? ''),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -196,7 +196,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(item.description),
+                                  Text(item.description ?? ''),
                                   const SizedBox(height: 4),
                                   Text(
                                     '\$${item.price.toStringAsFixed(2)} • ${item.category}',

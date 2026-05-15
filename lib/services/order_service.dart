@@ -1,13 +1,10 @@
-import 'dart:convert';
 import '../models/order_model.dart';
-import '../config/constants.dart';
+import '../models/cart_model.dart';
 import '../utils/logger.dart';
-import 'secure_storage_service.dart';
 
 /// Order Service for managing customer orders
 class OrderService {
   static final OrderService _instance = OrderService._internal();
-  final SecureStorageService _secureStorage = SecureStorageService();
 
   final List<Order> _orders = [];
 
@@ -61,7 +58,7 @@ class OrderService {
         throw OrderException('Customer name and phone are required');
       }
 
-      if (orderType == OrderType.delivery && deliveryAddress == null) {
+      if (orderType == 'delivery' && deliveryAddress == null) {
         throw OrderException(
           'Delivery address is required for delivery orders',
         );
@@ -71,17 +68,18 @@ class OrderService {
         id: _generateOrderId(),
         userId: userId,
         items: items,
-        orderType: orderType,
+        totalAmount: total,
+        deliveryAddress: deliveryAddress ?? '',
+        paymentMethod: 'card', // Default payment method
+        orderType: _parseOrderType(orderType),
         status: OrderStatus.pending,
         customerName: customerName,
         customerPhone: customerPhone,
         customerEmail: customerEmail,
-        deliveryAddress: deliveryAddress,
         subtotal: subtotal,
         tax: tax,
         deliveryFee: deliveryFee,
         discount: discount,
-        total: total,
         specialInstructions: specialInstructions,
         createdAt: DateTime.now(),
         isPaid: false,
@@ -138,8 +136,7 @@ class OrderService {
                 order.userId == userId &&
                 (order.status == OrderStatus.pending ||
                     order.status == OrderStatus.confirmed ||
-                    order.status == OrderStatus.preparing ||
-                    order.status == OrderStatus.ready),
+                    order.status == OrderStatus.preparing),
           )
           .toList();
     } catch (e) {
@@ -167,7 +164,10 @@ class OrderService {
   }
 
   /// Update order status
-  Future<Order?> updateOrderStatus(String orderId, String newStatus) async {
+  Future<Order?> updateOrderStatus(
+    String orderId,
+    OrderStatus newStatus,
+  ) async {
     try {
       AppLogger.info('Updating order $orderId status to $newStatus');
       final index = _orders.indexWhere((order) => order.id == orderId);
@@ -180,21 +180,20 @@ class OrderService {
         id: _orders[index].id,
         userId: _orders[index].userId,
         items: _orders[index].items,
+        totalAmount: _orders[index].totalAmount,
+        deliveryAddress: _orders[index].deliveryAddress,
+        paymentMethod: _orders[index].paymentMethod,
         orderType: _orders[index].orderType,
         status: newStatus,
         customerName: _orders[index].customerName,
         customerPhone: _orders[index].customerPhone,
         customerEmail: _orders[index].customerEmail,
-        deliveryAddress: _orders[index].deliveryAddress,
         subtotal: _orders[index].subtotal,
         tax: _orders[index].tax,
         deliveryFee: _orders[index].deliveryFee,
         discount: _orders[index].discount,
-        total: _orders[index].total,
         specialInstructions: _orders[index].specialInstructions,
         createdAt: _orders[index].createdAt,
-        completedAt: newStatus == OrderStatus.delivered ? DateTime.now() : null,
-        paymentMethod: _orders[index].paymentMethod,
         isPaid: _orders[index].isPaid,
         notes: _orders[index].notes,
       );
@@ -227,21 +226,20 @@ class OrderService {
         id: _orders[index].id,
         userId: _orders[index].userId,
         items: _orders[index].items,
+        totalAmount: _orders[index].totalAmount,
+        deliveryAddress: _orders[index].deliveryAddress,
+        paymentMethod: paymentMethod,
         orderType: _orders[index].orderType,
         status: _orders[index].status,
         customerName: _orders[index].customerName,
         customerPhone: _orders[index].customerPhone,
         customerEmail: _orders[index].customerEmail,
-        deliveryAddress: _orders[index].deliveryAddress,
         subtotal: _orders[index].subtotal,
         tax: _orders[index].tax,
         deliveryFee: _orders[index].deliveryFee,
         discount: _orders[index].discount,
-        total: _orders[index].total,
         specialInstructions: _orders[index].specialInstructions,
         createdAt: _orders[index].createdAt,
-        completedAt: _orders[index].completedAt,
-        paymentMethod: paymentMethod,
         isPaid: true,
         notes: _orders[index].notes,
       );
@@ -285,10 +283,22 @@ class OrderService {
 
   /// Get delivery fee based on distance
   double getDeliveryFee({required String orderType}) {
-    if (orderType == OrderType.delivery) {
+    if (orderType == 'delivery') {
       return 2.50; // Flat fee or calculate based on distance
     }
     return 0;
+  }
+
+  /// Parse string to OrderType enum
+  OrderType? _parseOrderType(String? orderType) {
+    if (orderType == null) return null;
+    try {
+      return OrderType.values.firstWhere(
+        (e) => e.toString().split('.').last == orderType.toLowerCase(),
+      );
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Generate unique order ID
@@ -300,8 +310,9 @@ class OrderService {
   /// Save order to storage
   Future<void> _saveOrder(Order order) async {
     try {
-      final key = '${AppConstants.cartItemsKey}_${order.id}';
-      await _secureStorage.saveString(key, jsonEncode(order.toJson()));
+      // For now, just store in memory. Implement actual storage if needed.
+      // final key = '${AppConstants.cartItemsKey}_${order.id}';
+      // await _secureStorage.saveString(key, jsonEncode(order.toJson()));
     } catch (e) {
       AppLogger.error('Error saving order to storage: $e');
     }

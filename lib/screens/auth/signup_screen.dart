@@ -4,7 +4,9 @@ import '../../config/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/custom/custom_text_field.dart';
 import '../../widgets/custom/custom_button.dart';
+import '../../widgets/custom/user_type_dropdown.dart';
 import '../../utils/validators.dart';
+import '../../models/user_model.dart';
 import 'login_screen.dart';
 
 /// Sign Up Screen
@@ -23,6 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
   late TextEditingController _phoneController;
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
+  UserRole _selectedUserType = UserRole.user;
 
   @override
   void initState() {
@@ -68,6 +71,7 @@ class _SignupScreenState extends State<SignupScreen> {
       password: _passwordController.text,
       fullName: _fullNameController.text.trim(),
       phoneNumber: _phoneController.text.trim(),
+      role: _selectedUserType,
     );
 
     if (!mounted) return;
@@ -122,6 +126,26 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 32),
+              // User Type Dropdown
+              UserTypeDropdown(
+                value: _selectedUserType,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedUserType = value;
+                    });
+                  }
+                },
+                label: 'Account Type',
+                hint: 'Select account type',
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please select an account type';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
               // Full Name
               CustomTextField(
                 label: 'Full Name',

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/order_model.dart';
+import '../models/cart_model.dart';
+import '../models/menu_item_model.dart';
 import '../services/order_service.dart';
 import '../utils/logger.dart';
 
@@ -66,15 +68,13 @@ class OrderProvider extends ChangeNotifier {
         _cartItems[existingItemIndex].quantity += quantity;
       } else {
         // New item, add to cart
-        final cartItem = CartItem(
-          id: '${DateTime.now().millisecondsSinceEpoch}_$menuItemId',
-          menuItemId: menuItemId,
-          itemName: itemName,
-          itemPrice: itemPrice,
+        final menuItem = MenuItem(
+          id: menuItemId,
+          name: itemName,
+          price: itemPrice,
           imageUrl: imageUrl,
-          quantity: quantity,
-          addedAt: DateTime.now(),
         );
+        final cartItem = CartItem(menuItem: menuItem, quantity: quantity);
         _cartItems.add(cartItem);
       }
 

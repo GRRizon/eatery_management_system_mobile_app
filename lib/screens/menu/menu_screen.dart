@@ -248,9 +248,11 @@ class _MenuScreenState extends State<MenuScreen> {
                   height: 140,
                   width: double.infinity,
                   color: AppColors.lightGray,
-                  child: item.imageUrl.startsWith('http')
+                  child:
+                      (item.imageUrl?.isNotEmpty ?? false) &&
+                          item.imageUrl!.startsWith('http')
                       ? Image.network(
-                          item.imageUrl,
+                          item.imageUrl!,
                           fit: BoxFit.cover,
                           errorBuilder: (_, _, _) => Container(
                             color: AppColors.primary.withValues(alpha: 0.1),
@@ -261,8 +263,9 @@ class _MenuScreenState extends State<MenuScreen> {
                             ),
                           ),
                         )
-                      : Image.asset(
-                          item.imageUrl,
+                      : item.imageUrl != null
+                      ? Image.asset(
+                          item.imageUrl!,
                           fit: BoxFit.cover,
                           errorBuilder: (_, _, _) => Container(
                             color: AppColors.primary.withValues(alpha: 0.1),
@@ -271,6 +274,14 @@ class _MenuScreenState extends State<MenuScreen> {
                               size: 40,
                               color: AppColors.primary,
                             ),
+                          ),
+                        )
+                      : Container(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          child: const Icon(
+                            Icons.restaurant,
+                            size: 40,
+                            color: AppColors.primary,
                           ),
                         ),
                 ),
@@ -347,7 +358,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
                   // Description
                   Text(
-                    item.description,
+                    item.description ?? '',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -397,7 +408,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                 menuItemId: item.id,
                                 itemName: item.name,
                                 itemPrice: item.price,
-                                imageUrl: item.imageUrl,
+                                imageUrl: item.imageUrl ?? '',
                               );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(

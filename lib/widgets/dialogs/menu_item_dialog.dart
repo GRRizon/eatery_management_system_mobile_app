@@ -81,9 +81,7 @@ class _MenuItemDialogState extends State<MenuItemDialog> {
         preparationTime: int.parse(_preparationTimeController.text),
         isVegetarian: _isVegetarian,
         isVegan: _isVegan,
-        createdAt: widget.menuItem?.createdAt ?? DateTime.now(),
         rating: widget.menuItem?.rating ?? 0.0,
-        reviewCount: widget.menuItem?.reviewCount ?? 0,
       );
 
       widget.onSave(menuItem);

@@ -48,17 +48,21 @@ class MenuItemCard extends StatelessWidget {
                     height: 180,
                     width: double.infinity,
                     color: AppColors.lightGray,
-                    child: item.imageUrl.startsWith('http')
+                    child:
+                        (item.imageUrl?.isNotEmpty ?? false) &&
+                            item.imageUrl!.startsWith('http')
                         ? Image.network(
-                            item.imageUrl,
+                            item.imageUrl!,
                             fit: BoxFit.cover,
                             errorBuilder: (_, _, _) => _buildPlaceholderImage(),
                           )
-                        : Image.asset(
-                            item.imageUrl,
+                        : item.imageUrl != null
+                        ? Image.asset(
+                            item.imageUrl!,
                             fit: BoxFit.cover,
                             errorBuilder: (_, _, _) => _buildPlaceholderImage(),
-                          ),
+                          )
+                        : _buildPlaceholderImage(),
                   ),
                 ),
                 // Availability Badge
@@ -88,7 +92,7 @@ class MenuItemCard extends StatelessWidget {
                     ),
                   ),
                 // Rating Badge
-                if (item.rating != null)
+                if (item.rating > 0)
                   Positioned(
                     top: 8,
                     left: 8,
@@ -111,7 +115,7 @@ class MenuItemCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 2),
                           Text(
-                            item.ratingString,
+                            item.rating.toStringAsFixed(1),
                             style: const TextStyle(
                               color: AppColors.white,
                               fontSize: 10,
@@ -156,7 +160,7 @@ class MenuItemCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     // Description
                     Text(
-                      item.description,
+                      item.description ?? '',
                       style: Theme.of(context).textTheme.bodySmall,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

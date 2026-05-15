@@ -10,9 +10,12 @@ class AuthService {
   static final AuthService _instance = AuthService._internal();
   final SecureStorageService _secureStorage = SecureStorageService();
 
-  // Mock user credentials (in production, use backend API)
-  static const String _mockUsername = 'Rabbani';
-  static const String _mockPassword = 'golam1234';
+  // Mock user credentials by role (in production, use backend API)
+  static const Map<UserRole, Map<String, String>> _mockCredentials = {
+    UserRole.user: {'username': 'Rabbani', 'password': 'golam1234'},
+    UserRole.admin: {'username': 'Admin', 'password': 'tasmin1234'},
+    UserRole.driver: {'username': 'Mikail', 'password': 'mikail1234'},
+  };
 
   User? _currentUser;
   String? _authToken;
@@ -48,6 +51,7 @@ class AuthService {
   Future<User?> login({
     required String username,
     required String password,
+    UserRole role = UserRole.user,
   }) async {
     try {
       AppLogger.info('Attempting login for user: $username');
@@ -58,25 +62,22 @@ class AuthService {
       }
 
       // Mock authentication (in production, use backend API)
-      if (username != _mockUsername || password != _mockPassword) {
+      final roleCredentials = _mockCredentials[role];
+      if (roleCredentials == null ||
+          username != roleCredentials['username'] ||
+          password != roleCredentials['password']) {
         throw AuthException(AppConstants.invalidCredentialsMessage);
       }
 
-      // Create mock user with role based on username
-      UserRole role = UserRole.user;
-      if (username.toLowerCase().contains('admin')) {
-        role = UserRole.admin;
-      } else if (username.toLowerCase().contains('driver')) {
-        role = UserRole.driver;
-      }
-
+      // Create mock user with the selected role
+      final userDetails = _getUserDetailsForRole(role);
       final user = User(
-        id: 'user_001',
+        id: 'user_${role.name}_001',
         username: username,
-        email: 'user@eatery.local',
-        fullName: 'Golam Rabbani',
-        phoneNumber: '+1-800-EATERY',
-        address: '123 Restaurant Lane, Food City',
+        email: userDetails['email']!,
+        fullName: userDetails['fullName']!,
+        phoneNumber: userDetails['phoneNumber']!,
+        address: userDetails['address'],
         profileImageUrl: null,
         createdAt: DateTime.now().subtract(const Duration(days: 30)),
         lastLoginAt: DateTime.now(),
@@ -107,6 +108,33 @@ class AuthService {
     }
   }
 
+  /// Get user details based on role
+  Map<String, String> _getUserDetailsForRole(UserRole role) {
+    switch (role) {
+      case UserRole.user:
+        return {
+          'email': 'rabbani@eatery.local',
+          'fullName': 'Golam Rabbani',
+          'phoneNumber': '+1-800-EATERY',
+          'address': '123 Restaurant Lane, Food City',
+        };
+      case UserRole.admin:
+        return {
+          'email': 'admin@eatery.local',
+          'fullName': 'Tasmin Admin',
+          'phoneNumber': '+1-800-ADMIN',
+          'address': '456 Management Blvd, Admin City',
+        };
+      case UserRole.driver:
+        return {
+          'email': 'mikail@eatery.local',
+          'fullName': 'Mikail Driver',
+          'phoneNumber': '+1-800-DRIVER',
+          'address': '789 Delivery Street, Driver Town',
+        };
+    }
+  }
+
   /// Sign up new user
   Future<User?> signup({
     required String username,
@@ -114,6 +142,7 @@ class AuthService {
     required String password,
     required String fullName,
     required String phoneNumber,
+    UserRole role = UserRole.user,
   }) async {
     try {
       AppLogger.info('Attempting signup for user: $username');
@@ -137,6 +166,7 @@ class AuthService {
         phoneNumber: phoneNumber,
         createdAt: DateTime.now(),
         isActive: true,
+        role: role,
       );
 
       AppLogger.info('User signed up successfully: ${user.username}');
