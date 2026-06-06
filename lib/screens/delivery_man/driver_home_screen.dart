@@ -47,7 +47,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       ),
       drawer: CustomDrawer(
         user: authProvider.currentUser!,
-        onLogout: () => authProvider.logout(),
+        onLogout: () => _handleLogout(context, authProvider),
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -72,5 +72,58 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         type: BottomNavigationBarType.fixed,
       ),
     );
+  }
+
+  /// Handle logout and navigate to authentication page
+  ///
+  /// This method:
+  /// - Calls logout on auth provider
+  /// - Closes the drawer
+  /// - Navigates back to login screen
+  Future<void> _handleLogout(
+    BuildContext context,
+    AuthProvider authProvider,
+  ) async {
+    // Close the drawer
+    Navigator.of(context).pop();
+
+    // Show loading indicator while logging out
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    try {
+      // Perform logout
+      await authProvider.logout();
+
+      // Dismiss loading indicator
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // Navigate to login screen
+      if (context.mounted) {
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/login', (route) => false);
+      }
+    } catch (e) {
+      // Dismiss loading indicator on error
+      if (context.mounted) {
+        Navigator.of(context).pop();
+
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Logout failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
